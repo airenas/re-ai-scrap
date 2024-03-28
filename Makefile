@@ -1,5 +1,5 @@
 log?=INFO
-python_cmd=PYTHONPATH=./ LOG_LEVEL=$(log) python
+python_cmd=PYTHONPATH=${CURDIR} LOG_LEVEL=$(log) python
 ############################################################
 run/demo/langchain: 
 	$(python_cmd) egs/langchain/main.py

@@ -2,12 +2,12 @@ import time
 
 from playwright.sync_api import sync_playwright
 
-from utils.logger import logger
+from ai_scrap.utils.logger import logger
 
 
 def submit_g_form(ctx, param):
     with sync_playwright() as p:
-        with p.chromium.launch(headless=False) as browser:
+        with p.chromium.launch(headless=ctx.headless) as browser:
             context = browser.new_context(locale="en-US")
             page = context.new_page()
             page.goto(param)
@@ -26,10 +26,14 @@ def submit_g_form(ctx, param):
             logger.info(f"submit?")
             submit_button = page.query_selector('span:has-text("Pateikti")')
             if submit_button:
-                submit_button.click()
-                logger.info(f"click")
+                if ctx.submit_forms:
+                    submit_button.click()
+                    logger.info(f"click")
+                else:
+                    logger.info(f"skip click")
+
             else:
-                logger.info(f"not found")
+                logger.warn(f"not submit found")
 
             logger.info(f"sleep")
             time.sleep(3)

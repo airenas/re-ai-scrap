@@ -5,69 +5,21 @@ import sys
 from langchain.storage import LocalFileStore
 from langchain_openai import ChatOpenAI
 
-from tools.company import extract_company_info
-from tools.forms_fields import extract_fields
-from tools.links import extract_news_links, get_expected_div_class
-from tools.submit_form import submit_g_form
-from utils.logger import logger
+from ai_scrap.utils.logger import logger
+from egs.langchain.tools.company import extract_company_info
+from egs.langchain.tools.forms_fields import extract_fields
+from egs.langchain.tools.links import get_expected_div_class, extract_news_links
+from egs.langchain.tools.submit_form import submit_g_form
 
 
 class AppContext:
 
-    def __init__(self, llm, store, g_forms_url, headless=True):
+    def __init__(self, llm, store, g_forms_url, headless=True, submit_forms=False):
         self.store = store
         self.llm = llm
         self.g_forms_url = g_forms_url
         self.headless = headless
-
-
-# def aa():
-#     planner = (
-#             ChatPromptTemplate.from_template("Generate an argument about: {input}")
-#             | ChatOpenAI()
-#             | StrOutputParser()
-#             | {"base_response": RunnablePassthrough()}
-#     )
-#
-#     arguments_for = (
-#             ChatPromptTemplate.from_template(
-#                 "List the pros or positive aspects of {base_response}"
-#             )
-#             | ChatOpenAI()
-#             | StrOutputParser()
-#     )
-#     arguments_against = (
-#             ChatPromptTemplate.from_template(
-#                 "List the cons or negative aspects of {base_response}"
-#             )
-#             | ChatOpenAI()
-#             | StrOutputParser()
-#     )
-#
-#     final_responder = (
-#             ChatPromptTemplate.from_messages(
-#                 [
-#                     ("ai", "{original_response}"),
-#                     ("human", "Pros:\n{results_1}\n\nCons:\n{results_2}"),
-#                     ("system", "Generate a final response given the critique"),
-#                 ]
-#             )
-#             | ChatOpenAI()
-#             | StrOutputParser()
-#     )
-#
-#     chain = (
-#             planner
-#             | {
-#                 "results_1": arguments_for,
-#                 "results_2": arguments_against,
-#                 "original_response": itemgetter("base_response"),
-#             }
-#             | final_responder
-#     )
-#
-#     result = chain.invoke({"input": "scrum"})
-#     print(result)
+        self.submit_forms = submit_forms
 
 
 def extract_links(ctx, url, limit):
@@ -104,6 +56,8 @@ def main(argv):
     parser = argparse.ArgumentParser(description="Langchain test file",
                                      epilog="E.g. " + sys.argv[0] + "",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--submit-forms", action="store_true", default=False, help="Submit form")
+    parser.add_argument("--headless", action="store_true", default=False, help="Use headless browser")
     args = parser.parse_args(args=argv)
     logger.info("starting")
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
@@ -111,8 +65,11 @@ def main(argv):
     os.makedirs(".tmp", exist_ok=True)
 
     ctx = AppContext(llm=llm, store=store,
-                     g_forms_url="https://docs.google.com/forms/d/e/1FAIpQLSf_mqy-Rzc3fYyAzLTEBGdsI_scg67n_yr1qK2hrYh3_BDx1A/viewform")
-
+                     g_forms_url="https://docs.google.com/forms/d/e/1FAIpQLSf_mqy-Rzc3fYyAzLTEBGdsI_scg67n_yr1qK2hrYh3_BDx1A/viewform",
+                     headless=args.headless,
+                     submit_forms=args.submit_forms)
+    logger.info(f"submit_forms: {ctx.submit_forms}")
+    logger.info(f"headless: {ctx.headless}")
     wanted_fields = extract_wanted_fields(ctx)
     links = extract_links(ctx, "https://www.prnewswire.com/news-releases/news-releases-list/", 5)
 

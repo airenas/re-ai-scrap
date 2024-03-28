@@ -8,10 +8,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from utils.cached_loader import CachedLoader
-from utils.logger import logger
-from utils.storage import get_store, set_store
-from utils.tmp_file_saver import save_tmp_docs
+from ai_scrap.utils.logger import logger
+from ai_scrap.utils.storage import get_store, set_store
+from egs.langchain.utils.cached_loader import CachedLoader
+from ai_scrap.utils.tmp_file_saver import save_tmp_docs
 
 schema = {
     "properties": {

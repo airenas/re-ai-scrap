@@ -4,10 +4,10 @@ from langchain_community.document_transformers.beautiful_soup_transformer import
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from utils.cached_loader import CachedLoader
-from utils.logger import logger
-from utils.storage import get_store, set_store
-from utils.tmp_file_saver import save_tmp_docs
+from ai_scrap.utils.logger import logger
+from ai_scrap.utils.storage import set_store, get_store
+from egs.langchain.utils.cached_loader import CachedLoader
+from ai_scrap.utils.tmp_file_saver import save_tmp_docs
 
 
 def extract(llm, content: str, schema: dict):

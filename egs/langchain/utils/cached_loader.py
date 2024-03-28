@@ -8,7 +8,7 @@ from typing import Iterator, List
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
-from utils.logger import logger
+from ai_scrap.utils.logger import logger
 
 
 class CachedLoader(BaseLoader):
