@@ -20,6 +20,10 @@ def extract(llm, content: str, schema: dict):
     return create_extraction_chain(schema=schema, llm=llm).invoke(input={"input": content})
 
 
+def field_names(res):
+    return [f.get("input_name", "") for f in res if f.get("input_name")]
+
+
 def extract_fields(ctx, urls):
     logger.info(f"loading pages {urls}")
     loader = CachedLoader(urls=[urls], dir=".cache")
@@ -33,7 +37,7 @@ def extract_fields(ctx, urls):
     )
     save_tmp_docs(docs_transformed, "g_docs_transformed.txt")
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=3000, chunk_overlap=0
+        chunk_size=ctx.context, chunk_overlap=0
     )
     splits = splitter.split_documents(docs_transformed)
     save_tmp_docs(splits, "g_splits.txt")
@@ -51,4 +55,4 @@ def extract_fields(ctx, urls):
         if len(res) >= 10:
             break
     logger.info(f"extracted fields {len(res)}\n=========================================\n{res}\n")
-    return res
+    return field_names(res)

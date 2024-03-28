@@ -57,7 +57,7 @@ def extract_news_links(ctx, urls, limit, cls):
     )
     save_tmp_docs(docs, "l_docs_transformed.txt")
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=3000, chunk_overlap=0
+        chunk_size=ctx.context, chunk_overlap=0
     )
     docs = splitter.split_documents(docs)
     save_tmp_docs(docs, "l_splits.txt")
