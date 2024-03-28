@@ -10,8 +10,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ai_scrap.utils.logger import logger
 from ai_scrap.utils.storage import get_store, set_store
-from egs.langchain.utils.cached_loader import CachedLoader
+from ai_scrap.utils.timer import Timer
 from ai_scrap.utils.tmp_file_saver import save_tmp_docs
+from egs.langchain.utils.cached_loader import CachedLoader
 
 schema = {
     "properties": {
@@ -23,8 +24,9 @@ schema = {
 
 
 def extract(llm, content: str, schema: dict):
-    logger.info(f"calling llm")
-    return create_extraction_chain(schema=schema, llm=llm).invoke(input={"input": content})
+    with Timer("llm"):
+        logger.info(f"calling llm")
+        return create_extraction_chain(schema=schema, llm=llm).invoke(input={"input": content})
 
 
 def unique_divs(divs):
@@ -117,7 +119,8 @@ def get_expected_div_class(ctx, urls):
                 "Return just one class name without explanation"
             )
             runnable = prompt | ctx.llm | StrOutputParser()
-            llm_res = runnable.invoke({"classes": counter.most_common(20)})
+            with Timer("llm"):
+                llm_res = runnable.invoke({"classes": counter.most_common(20)})
             set_store(ctx.store, f"{counter.most_common(20)}", llm_res)
         logger.info(f"llm_res {llm_res}")
         res = get_most_expected_div_name(counter, llm_res)

@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import time
 
 from langchain.storage import LocalFileStore
 from langchain_openai import ChatOpenAI
@@ -75,9 +76,10 @@ def main(argv):
     os.makedirs(".tmp", exist_ok=True)  # for temp results
 
     llm = ChatOpenAI(model=args.model, temperature=0)
+    started = time.perf_counter()
     store = LocalFileStore(".store")
     ctx = AppContext(llm=llm, store=store,
-                     g_forms_url="https://docs.google.com/forms/d/e/1FAIpQLSf_mqy-Rzc3fYyAzLTEBGdsI_scg67n_yr1qK2hrYh3_BDx1A/viewform",
+                     g_forms_url="https://forms.gle/f6ukAo2tkoNu5H7w7",
                      headless=args.headless,
                      submit_forms=args.submit_forms,
                      context=args.context)
@@ -85,12 +87,11 @@ def main(argv):
     logger.info("starting")
     wanted_fields = extract_wanted_fields(ctx)
     links = extract_links(ctx, "https://www.prnewswire.com/news-releases/news-releases-list/", args.limit)
-
     for (i, l) in enumerate(links):
         data = collect_data(ctx, l, wanted_fields, i)
         submit_form(ctx, l, wanted_fields, data)
 
-    logger.info("done")
+    logger.info(f"done in {time.perf_counter() - started:.3f}")
 
 
 if __name__ == "__main__":

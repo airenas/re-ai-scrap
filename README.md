@@ -41,14 +41,20 @@ Form to correct company data: https://forms.gle/f6ukAo2tkoNu5H7w7
 #### Running sample
 
 
-
 ```bash
 export OPENAI_API_KEY=....
 
-make run/langchain
+## take tha last 3 articles
+make run/demo/langchain  params="--limit=3"
 
-## demo caches all call to web and llm
+## demo caches all calls to web and llm
 ## clean cache
 make clean/cache
+
+## run with gpt-4
+make run/demo/langchain params="--limit=3 --model=gpt-4-0125-preview --context=12000"
+
+## submit form
+make run/demo/langchain params="--limit=3 --model=gpt-4-0125-preview --context=12000 --submit_forms"
 
 ```

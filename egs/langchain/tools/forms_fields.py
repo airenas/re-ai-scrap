@@ -4,6 +4,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ai_scrap.utils.logger import logger
 from ai_scrap.utils.storage import get_store, set_store
+from ai_scrap.utils.timer import Timer
 from ai_scrap.utils.tmp_file_saver import save_tmp_docs
 from egs.langchain.utils.cached_loader import CachedLoader
 
@@ -16,8 +17,9 @@ schema = {
 
 
 def extract(llm, content: str, schema: dict):
-    logger.info(f"calling llm")
-    return create_extraction_chain(schema=schema, llm=llm).invoke(input={"input": content})
+    with Timer("llm"):
+        logger.info(f"calling llm")
+        return create_extraction_chain(schema=schema, llm=llm).invoke(input={"input": content})
 
 
 def field_names(res):

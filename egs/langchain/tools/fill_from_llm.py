@@ -3,6 +3,7 @@ from langchain_core.prompts import PromptTemplate
 
 from ai_scrap.utils.logger import logger
 from ai_scrap.utils.storage import set_store, get_store
+from ai_scrap.utils.timer import Timer
 from egs.langchain.tools.company import to_field
 
 
@@ -16,7 +17,8 @@ def fill_missing_from_llm(ctx, data, fields, i):
         )
         runnable = prompt | ctx.llm | JsonOutputParser()
         cleaned = {to_field(k): "" for k in fields}
-        llm_res = runnable.invoke({"data": cleaned, "company": data.get("company_name")})
+        with Timer("llm"):
+            llm_res = runnable.invoke({"data": cleaned, "company": data.get("company_name")})
         set_store(ctx.store, f"{data}", llm_res)
     logger.info(f"was  =========================================\n{data}\n")
     logger.info(f"new  =========================================\n{llm_res}\n")
