@@ -35,6 +35,7 @@ def submit_g_form(ctx, param):
             else:
                 logger.warn(f"not submit found")
 
-            logger.info(f"sleep")
-            time.sleep(3)
+            if not ctx.headless:
+                logger.info(f"sleep")
+                time.sleep(3)
             browser.close()
