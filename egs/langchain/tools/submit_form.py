@@ -38,6 +38,8 @@ def get_selector(soup, key, all_keys):
         if "type" in el.attrs:
             if el.attrs["type"] == "text":
                 filtered.append(el)
+        elif el.name == "textarea":
+            filtered.append(el)
     other_keys = set()
     for k in all_keys:
         if k != key:
