@@ -49,7 +49,7 @@ def collect_data(ctx, l, wanted_fields, i):
 
 def submit_form(ctx, l, wanted_fields, data):
     logger.info(f"submit form for {data.get('company_name')}")
-    submit_g_form(ctx, ctx.g_forms_url)
+    submit_g_form(ctx, data)
 
 
 def main(argv):
@@ -58,6 +58,7 @@ def main(argv):
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--submit-forms", action="store_true", default=False, help="Submit form")
     parser.add_argument("--headless", action="store_true", default=False, help="Use headless browser")
+    parser.add_argument("--limit", default=10, type=int, help="Companies to select")
     args = parser.parse_args(args=argv)
     logger.info("starting")
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
@@ -70,8 +71,9 @@ def main(argv):
                      submit_forms=args.submit_forms)
     logger.info(f"submit_forms: {ctx.submit_forms}")
     logger.info(f"headless: {ctx.headless}")
+    logger.info(f"limit: {args.limit}")
     wanted_fields = extract_wanted_fields(ctx)
-    links = extract_links(ctx, "https://www.prnewswire.com/news-releases/news-releases-list/", 5)
+    links = extract_links(ctx, "https://www.prnewswire.com/news-releases/news-releases-list/", args.limit)
 
     for (i, l) in enumerate(links):
         data = collect_data(ctx, l, wanted_fields, i)
